@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+/* 
+ * Replaces the 'extend' section from tailwind.config.js
+ * Theme variables are automatically converted into utility classes.
+ */
+@theme {
+  --color-white: #ffffff;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-500: #6b7280;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-blue-200: #93c5fd;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-dark-bg: #101214;
+  --color-dark-secondary: #1d1f21;
+  --color-dark-tertiary: #3b3d40;
+  --color-blue-primary: #0275ff;
+  --color-stroke-dark: #2d3135;
+
+  /*
+   * The 'backgroundImage' utility is now defined within the @theme block.
+   * Note the use of the '--image-' namespace instead of `--bg-`.
+   */
+  --image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
+  --image-gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
+}
+
+/*
+ * CSS layers from standard CSS are now used to manage the order of styles.
+ * Use `@layer base` for your base styles, which replaces the `*, ::before, ::after` selectors.
+ * The `* { box-sizing: border-box; }` is now part of the default preflight styles, so it's not strictly necessary.
+ */
+@layer base {
+  html,
+  body,
+  #root,
+  .app {
+    height: 100%;
+    width: 100%;
+    @apply text-sm;
+    @apply bg-white;
+    @apply dark:bg-black
+  }
+}
+
+/* 
+ * This media query replaces the `darkMode: "class"` configuration.
+ * By using the `.dark` selector, you can specify dark mode styles directly.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+/* TIMELINE STYLING - remains largely the same */
+.timeline ._3_ygE {
+  @apply rounded-tl-md border border-r-0 border-[#e6e4e4] dark:border-stroke-dark;
+}
+.timeline ._2eZzQ {
+  @apply border-[#e6e4e4] dark:border-stroke-dark;
+}
+.timeline ._2dZTy {
+  @apply fill-white dark:fill-dark-secondary;
+}
+.timeline ._2dZTy:nth-child(even) {
+  @apply fill-[#f5f5f5] dark:fill-dark-tertiary;
+}
+.timeline ._35nLX {
+  @apply fill-white stroke-[#e6e4e4] dark:fill-dark-secondary dark:stroke-stroke-dark;
+}
+.timeline ._9w8d5 {
+  @apply fill-[#333] dark:fill-white;
+}
+.timeline ._34SS0 {
+  @apply bg-white dark:bg-dark-secondary;
+}
+.timeline ._34SS0:nth-of-type(even) {
+  @apply bg-[#f5f5f5] dark:bg-dark-tertiary;
+}
+.timeline ._RuwuK,
+.timeline ._3rUKi,
+.timeline ._1rLuZ {
+  @apply stroke-[#e6e4e4] dark:stroke-stroke-dark;
+}
+.timeline ._3ZbQT {
+  @apply border-l-0 border-[#e6e4e4] dark:border-stroke-dark;
+}
+.timeline ._3T42e {
+  @apply bg-white dark:bg-dark-bg;
+}
+.timeline ._29NTg {
+  /* Using a literal dark mode class here as `dark:text-neutral-500` is a v3 utility */
+  .dark & {
+    color: var(--color-neutral-500);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
