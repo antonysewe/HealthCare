@@ -10,6 +10,10 @@ import taskRoutes from "./routes/taskRoutes";
 import searchRoutes from "./routes/searchRoutes";
 import userRoutes from "./routes/userRoutes";
 
+import moleculesBankRoutes from "./routes/moleculesBankRoutes"
+import moleculeRoutes from "./routes/moleculeRoutes"
+import generatedMoleculesRoutes from  "./routes/generatedMoleculesRoutes"
+
 /* CONFIGURATIONS */
 dotenv.config();
 const app = express();
@@ -33,6 +37,11 @@ app.use("/projects", projectRoutes);
 app.use("/tasks", taskRoutes);
 app.use("/search",searchRoutes);
 app.use("/users" , userRoutes);
+
+/* MOLECULE  ROUTES */
+app.use("/moleculesbank", moleculesBankRoutes);
+app.use("/molecules", moleculeRoutes);
+app.use("/api/molecules", generatedMoleculesRoutes);
 
 
 /* SERVER */

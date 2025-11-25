@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import Image from 'next/image';
-import { ChevronDown, ChevronUp, Users, User, Settings, Search, Briefcase, Home, LockIcon, LucideIcon, X, AlertCircle, ShieldAlert, AlertTriangle, AlertOctagon, Layers3 } from 'lucide-react';
+import { ChevronDown, Microscope, ChevronUp, Users, User, Settings, Search, Briefcase, Home, LockIcon, LucideIcon, X, AlertCircle, ShieldAlert, AlertTriangle, AlertOctagon, Layers3, Atom, Network } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/app/redux';
 import Link from 'next/link';
@@ -56,9 +56,13 @@ const Sidebar = () => {
                 </div>
             </div>
         </div>
-        {/* NAVBAR LINKS */}
+        {/* SIDEBAR LINKS */}
         <nav className="z-10 w-full">
           <SidebarLink icon={Home} label="Home" href="/" />
+          <SidebarLink icon={Network} label="Model" href="/model" />
+          <SidebarLink icon={Atom} label="MoleculesBank" href="/moleculesbank" />
+          <SidebarLink icon={Search} label="Research" href="/research" />
+          <SidebarLink icon={Microscope} label="DeepSearch" href="/deepsearch"/>
           <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
           <SidebarLink icon={Search} label="Search" href="/search" />
           <SidebarLink icon={Settings} label="Settings" href="/settings" />

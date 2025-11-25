@@ -27,6 +27,7 @@ async function main() {
   const dataDirectory = path.join(__dirname, "seedData");
 
   const orderedFileNames = [
+    "molecule.json",
     "team.json",
     "project.json",
     "projectTeam.json",

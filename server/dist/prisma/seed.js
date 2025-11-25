@@ -39,6 +39,7 @@ function main() {
     return __awaiter(this, void 0, void 0, function* () {
         const dataDirectory = path_1.default.join(__dirname, "seedData");
         const orderedFileNames = [
+            "molecule.json",
             "team.json",
             "project.json",
             "projectTeam.json",

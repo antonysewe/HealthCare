@@ -27,6 +27,7 @@ model User {
   attachments     Attachment[]
   comments        Comment[]
   team            Team?            @relation(fields: [teamId], references: [id])
+  moleculeGenerationHistories MoleculeGenerationHistory[]
 }
 
 model Team {
@@ -106,4 +107,29 @@ model Comment {
 
   task Task @relation(fields: [taskId], references: [id])
   user User @relation(fields: [userId], references: [userId])
+}
+
+// MOLECULAR BANK MODEL
+model Molecule {
+  id              Int      @id @default(autoincrement())
+  moleculeName    String
+  smilesStructure String   @unique
+  molecularWeight Float
+  categoryUsage   String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+}
+model MoleculeGenerationHistory {
+  id                Int      @id @default(autoincrement())
+  smiles            String
+  numMolecules      Int
+  minSimilarity     Float
+  particles         Int
+  iterations        Int
+  generatedMolecules Json
+  userId            Int
+  user              User     @relation(fields: [userId], references: [userId])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
