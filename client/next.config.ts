@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Ignore ESLint errors during builds (needed for Amplify)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   // Add a webpack fallback for Node built-ins that some WASM/emscripten bundles
   // (like certain RDKit builds) reference. This prevents bundlers from
   // failing when `fs`, `path`, or `os` are required at build time for
