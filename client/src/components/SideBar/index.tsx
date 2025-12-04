@@ -14,17 +14,33 @@ import Link from 'next/link';
 import { setIsSidebarCollapsed } from '@/state';
 import { useGetProjectsQuery } from '@/state/api';
 
-/* Variants */
+/* ------------------ Variants ------------------ */
+
 const itemVariants: Variants = {
   hidden: { opacity: 0, x: -20 },
   visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 120 } },
 };
 
+/* Accordion animation */
 const accordionVariants: Variants = {
   collapsed: { height: 0, opacity: 0, transition: { duration: 0.2 } },
   expanded: { height: "auto", opacity: 1, transition: { type: "spring", stiffness: 110, damping: 14 } },
 };
 
+/* Active Icon Pulse */
+const activeIconPulse: Variants = {
+  initial: {
+    scale: 1,
+  },
+  animate: {
+    scale: [1, 1.15, 1],
+    transition: {
+      duration: 3,
+      repeat: Infinity,
+      ease: "easeInOut",
+    },
+  },
+};
 /* ------------------ MAIN SIDEBAR ------------------ */
 const Sidebar = () => {
   const [showProjects, setShowProjects] = useState(true);
@@ -36,11 +52,11 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* Mobile Backdrop */}
+      {/* Backdrop Mobile */}
       <AnimatePresence>
         {!isSidebarCollapsed && (
           <motion.div
-            className="fixed inset-0 bg-black/30 z-30 lg:hidden"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -50,18 +66,24 @@ const Sidebar = () => {
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
+      {/* Sidebar Panel */}
       <motion.div
-        className="fixed flex flex-col h-screen w-64 justify-start shadow-xl z-40 
-          backdrop-blur-xl bg-white/30 dark:bg-gray-900/30 border-r border-gray-200 dark:border-gray-700"
+        className="
+    fixed left-0 top-0 h-screen w-64 z-40
+    flex flex-col justify-start
+    backdrop-blur-xl 
+    bg-white/15 dark:bg-gray-900/20
+    border-r border-white/20 dark:border-gray-700/30
+    rounded-r-3xl
+    shadow-[0_8px_30px_rgba(0,0,0,0.15)]
+    p-2 "
         initial={{ x: -260 }}
         animate={{ x: isSidebarCollapsed ? -260 : 0 }}
-        transition={{ type: "spring", stiffness: 90, damping: 20 }}
+        transition={{ type: "spring", stiffness: 80, damping: 18 }}
       >
-        {/* Top Logo/Header */}
-        <motion.div variants={itemVariants}>
-          <div className="z-50 flex min-h-[56px] w-64 items-center justify-between 
-            px-6 pt-3 border-b border-gray-200 dark:border-gray-800">
+        {/* Header */}
+        <motion.div variants={itemVariants} className="border-b border-white/20 dark:border-gray-700">
+          <div className="flex min-h-[56px] w-64 items-center justify-between px-6 pt-3">
             <div className='text-xl font-bold text-gray-800 dark:text-white'>MediPlus</div>
             <button className='py-3' onClick={() => dispatch(setIsSidebarCollapsed(true))}>
               <X className='h-6 w-6 text-gray-800 hover:text-gray-500 dark:text-white' />
@@ -69,10 +91,10 @@ const Sidebar = () => {
           </div>
         </motion.div>
 
-        {/* Team Info */}
+        {/* Team Section */}
         <motion.div variants={itemVariants}>
-          <div className='flex-shrink-0 flex w-64 items-center gap-5 border-y-[1.5px] border-gray-200 
-            px-8 py-4 dark:border-gray-700'>
+          <div className='flex-shrink-0 flex w-64 items-center gap-5 border-y border-white/20 
+            px-8 py-4 dark:border-gray-700/40'>
             <Image src='/logo.png' alt='Team Logo' width={40} height={40} className='rounded-full' />
             <div>
               <h3 className='text-md font-bold tracking-wide dark:text-gray-200'>Antony Team</h3>
@@ -84,9 +106,9 @@ const Sidebar = () => {
           </div>
         </motion.div>
 
-        {/* Links */}
+        {/* Main Scrollable Links Section */}
         <div className="flex-1 overflow-y-auto w-full pb-8">
-          <nav className="z-10 w-full">
+          <nav className="w-full">
             <AnimatedLink icon={Home} label="Home" href="/" />
             <AnimatedLink icon={Network} label="Model" href="/model" />
             <AnimatedLink icon={Atom} label="MoleculesBank" href="/moleculesbank" />
@@ -163,6 +185,7 @@ interface SidebarLinkProps {
   icon: LucideIcon;
   label: string;
 }
+
 const AnimatedLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
   const pathname = usePathname();
   const isActive = pathname === href;
@@ -173,19 +196,32 @@ const AnimatedLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
         whileHover={{ scale: 1.03 }}
         transition={{ type: "spring", stiffness: 160, damping: 12 }}
         className={`relative flex cursor-pointer items-center gap-3 
-          transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 
-          ${isActive ? "bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-white" : ""}
+          transition-colors hover:bg-gray-100/50 dark:hover:bg-gray-800/50 
+          ${isActive ? "bg-blue-50/60 dark:bg-gray-700 text-blue-600 dark:text-white" : ""}
           px-8 py-3 rounded-md`}
       >
         {isActive && (
-          <motion.div layoutId="active-link" className="absolute left-0 top-0 h-full w-[5px] bg-blue-500 dark:bg-blue-300 rounded-r" />
+          <motion.div
+            layoutId="active-link"
+            className="absolute left-0 top-0 h-full w-[5px] bg-blue-500 dark:bg-blue-300 rounded-r"
+          />
         )}
-        <Icon className="h-10 w-7 dark:text-gray-100" />
+
+        {/* ACTIVE PULSING ICON */}
+        <motion.div
+          variants={activeIconPulse}
+          initial="initial"
+          animate={isActive ? "animate" : "initial"}
+          className="flex items-center"
+        >
+          <Icon className="h-10 w-7 dark:text-gray-100" />
+        </motion.div>
+
         <span className="font-medium text-gray-800 dark:text-gray-100">{label}</span>
       </motion.div>
     </Link>
-  )
-}
+  );
+};
 
 /* ------------------ Accordion Button ------------------ */
 interface AccordionButtonProps {
@@ -196,8 +232,8 @@ interface AccordionButtonProps {
 const AccordionButton = ({ label, isOpen, toggle }: AccordionButtonProps) => (
   <motion.button
     onClick={toggle}
-    className="flex w-full items-center justify-between px-8 py-3 text-gray-500 
-      hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-semibold"
+    className="flex w-full items-center justify-between px-8 py-3 text-gray-600 
+      hover:bg-gray-50/40 dark:hover:bg-gray-800/50 transition-colors font-semibold"
   >
     <span>{label}</span>
     <motion.div
@@ -210,4 +246,3 @@ const AccordionButton = ({ label, isOpen, toggle }: AccordionButtonProps) => (
 );
 
 export default Sidebar;
-

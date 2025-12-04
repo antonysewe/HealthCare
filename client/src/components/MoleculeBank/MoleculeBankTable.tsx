@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import MoleculeStructure from "../MoleculeStructure/index";
 
@@ -71,14 +72,14 @@ const TableOne = () => {
 
   useEffect(() => {
     const filteredData = moleculeBank.filter((molecule) =>
-      molecule.moleculeName.toLowerCase().includes(searchQuery.toLowerCase()),
+      molecule.moleculeName.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredMolecules(filteredData);
   }, [searchQuery]);
 
   return (
-    <div className="rounded-lg border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-[#181818] dark:bg-[#181818] sm:px-7.5 xl:pb-1">
-      <h4 className="mb-6 text-xl font-semibold text-black dark:text-white">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900 p-6">
+      <h4 className="mb-6 text-xl font-semibold text-gray-900 dark:text-gray-200">
         Molecules
       </h4>
 
@@ -87,66 +88,58 @@ const TableOne = () => {
         placeholder="Search molecule"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="border-gray-300 text-gray-700 placeholder-gray-400 dark:border-gray-600 dark:placeholder-gray-500 text-md mb-4 w-full rounded-lg border bg-white px-4 py-3 shadow-sm outline-none focus:border-primary focus:ring-primary dark:bg-[#181818] dark:text-white"
+        className="w-full mb-4 rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-700 placeholder-gray-400 shadow-sm outline-none focus:border-sky-500 focus:ring focus:ring-sky-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-500"
       />
+
       <div className="flex flex-col">
-        <div className="grid grid-cols-3 rounded-lg bg-gray-2 dark:bg-[#121212] sm:grid-cols-4">
+        {/* Table Header */}
+        <div className="grid grid-cols-3 rounded-t-lg bg-gray-100 dark:bg-gray-800 sm:grid-cols-4">
           <div className="p-2.5 xl:p-5">
-            <h5 className="text-sm font-medium uppercase xsm:text-base">
-              Molecule name
+            <h5 className="text-sm font-medium uppercase text-gray-900 dark:text-gray-200 xsm:text-base">
+              Molecule Name
             </h5>
           </div>
           <div className="p-2.5 text-center xl:p-5">
-            <h5 className="text-sm font-medium uppercase xsm:text-base">
+            <h5 className="text-sm font-medium uppercase text-gray-900 dark:text-gray-200 xsm:text-base">
               Smile Structure Image
             </h5>
           </div>
           <div className="p-2.5 text-center xl:p-5">
-            <h5 className="text-sm font-medium uppercase xsm:text-base">
-              Molecular Weights (g/mol)
+            <h5 className="text-sm font-medium uppercase text-gray-900 dark:text-gray-200 xsm:text-base">
+              Molecular Weight (g/mol)
             </h5>
           </div>
           <div className="hidden p-2.5 text-center sm:block xl:p-5">
-            <h5 className="text-sm font-medium uppercase xsm:text-base">
+            <h5 className="text-sm font-medium uppercase text-gray-900 dark:text-gray-200 xsm:text-base">
               Category Usage
             </h5>
           </div>
         </div>
 
+        {/* Table Rows */}
         {filteredMolecules.map((molecule, key) => (
           <div
-            className={`grid grid-cols-3 sm:grid-cols-4 ${
-              key === filteredMolecules.length - 1
-                ? ""
-                : "border-b border-stroke dark:border-strokedark"
-            }`}
             key={key}
+            className={`grid grid-cols-3 sm:grid-cols-4 ${
+              key !== filteredMolecules.length - 1
+                ? "border-b border-gray-200 dark:border-gray-700"
+                : ""
+            }`}
           >
             <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-black dark:text-white">
-                {molecule.moleculeName}
-              </p>
+              <p className="text-gray-900 dark:text-gray-200">{molecule.moleculeName}</p>
             </div>
 
-            <div className="flex items-center gap-3 p-2.5 xl:p-5">
-              <div className="flex-shrink-0">
-                <MoleculeStructure
-                  id={`${key}`}
-                  structure={molecule.smilesStructure}
-                />
-              </div>
+            <div className="flex items-center justify-center p-2.5 xl:p-5">
+              <MoleculeStructure id={`${key}`} structure={molecule.smilesStructure} />
             </div>
 
             <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
-              <p className="text-black dark:text-white">
-                {molecule.molecularWeight}
-              </p>
+              <p className="text-gray-900 dark:text-gray-200">{molecule.molecularWeight}</p>
             </div>
 
             <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
-              <p className="text-black dark:text-white">
-                {molecule.categoryUsage}
-              </p>
+              <p className="text-gray-900 dark:text-gray-200">{molecule.categoryUsage}</p>
             </div>
           </div>
         ))}

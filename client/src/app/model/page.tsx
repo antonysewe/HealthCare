@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import MoleculeStructure from "../../components/MoleculeStructure/index";
+import { History, Activity, Atom } from 'lucide-react';
 
 interface GeneratedMolecule {
   structure: string;
@@ -32,8 +33,7 @@ const ModalLayout = () => {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Replace this with the logged-in user's ID from your auth system
-  const userId = 1; // Example: hard-coded user ID for now
+  const userId = 1; // Example user ID
 
   // Fetch history from server
   const fetchHistory = async () => {
@@ -68,9 +68,7 @@ const ModalLayout = () => {
     try {
       const response = await fetch("http://localhost:8000/api/molecules/generate", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -84,7 +82,7 @@ const ModalLayout = () => {
 
       setMolecules(generatedMolecules);
 
-      // Save history to server
+      // Save history
       await fetch("http://localhost:8000/molecules/history", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -99,7 +97,6 @@ const ModalLayout = () => {
         }),
       });
 
-      // Refresh history
       fetchHistory();
     } catch (error) {
       console.error("Error generating molecules:", error);
@@ -108,14 +105,19 @@ const ModalLayout = () => {
     }
   };
 
+  // Card container classes for light & dark mode
+  const cardClasses = "rounded-xl border shadow-2xl transition-colors " +
+    "bg-white border-gray-300 dark:bg-gray-950 dark:border-gray-800";
+
   return (
     <>
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-3">
         {/* Form Section */}
         <div className="flex flex-col gap-9 sm:col-span-2">
-          <div className="rounded-lg border border-stroke bg-white shadow-default dark:border-[#121212] dark:bg-[#181818]">
-            <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
-              <h3 className="font-medium text-black dark:text-white">
+          <div className={cardClasses}>
+            <div className="border-b border-gray-300 dark:border-gray-800 px-6.5 py-4 flex items-center justify-between">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+                <Activity className="h-5 w-5 text-sky-500 mr-2"/>
                 SMILES to Molecule Generator
               </h3>
             </div>
@@ -124,8 +126,8 @@ const ModalLayout = () => {
               <div className="p-6.5">
                 {/* SMILES & Number */}
                 <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <div className="w-full xl:w-2/3">
+                    <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       SMILES String
                     </label>
                     <input
@@ -133,12 +135,12 @@ const ModalLayout = () => {
                       value={smiles}
                       onChange={(e) => setSmiles(e.target.value)}
                       placeholder="Enter SMILES string"
-                      className="w-full rounded-lg border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary dark:border-gray-2 dark:bg-[#181818] dark:text-white dark:focus:border-primary"
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-5 py-3 text-gray-900 dark:text-white outline-none transition focus:border-sky-500 active:border-sky-500 placeholder-gray-500 text-sm resize-none"
                     />
                   </div>
 
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <div className="w-full xl:w-1/3">
+                    <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Number of Molecules
                     </label>
                     <input
@@ -146,14 +148,14 @@ const ModalLayout = () => {
                       value={numMolecules}
                       onChange={(e) => setNumMolecules(e.target.value)}
                       placeholder="Enter number of molecules"
-                      className="w-full rounded-lg border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary dark:border-gray-2 dark:bg-[#181818] dark:text-white dark:focus:border-primary"
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-5 py-3 text-gray-900 dark:text-white outline-none transition focus:border-sky-500 active:border-sky-500 placeholder-gray-500 text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Other parameters */}
                 <div className="mb-4.5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Minimum Similarity
                   </label>
                   <input
@@ -161,12 +163,12 @@ const ModalLayout = () => {
                     value={minSimilarity}
                     onChange={(e) => setMinSimilarity(e.target.value)}
                     placeholder="Enter minimum similarity"
-                    className="w-full rounded-lg border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary dark:border-gray-2 dark:bg-[#181818] dark:text-white dark:focus:border-primary"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-5 py-3 text-gray-900 dark:text-white outline-none transition focus:border-sky-500 active:border-sky-500 placeholder-gray-500 text-sm"
                   />
                 </div>
 
                 <div className="mb-4.5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Particles
                   </label>
                   <input
@@ -174,12 +176,12 @@ const ModalLayout = () => {
                     value={particles}
                     onChange={(e) => setParticles(e.target.value)}
                     placeholder="Enter number of particles"
-                    className="w-full rounded-lg border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary dark:border-gray-2 dark:bg-[#181818] dark:text-white dark:focus:border-primary"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-5 py-3 text-gray-900 dark:text-white outline-none transition focus:border-sky-500 active:border-sky-500 placeholder-gray-500 text-sm"
                   />
                 </div>
 
                 <div className="mb-4.5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Iterations
                   </label>
                   <input
@@ -187,16 +189,24 @@ const ModalLayout = () => {
                     value={iterations}
                     onChange={(e) => setIterations(e.target.value)}
                     placeholder="Enter number of iterations"
-                    className="w-full rounded-lg border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary dark:border-gray-2 dark:bg-[#181818] dark:text-white dark:focus:border-primary"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-5 py-3 text-gray-900 dark:text-white outline-none transition focus:border-sky-500 active:border-sky-500 placeholder-gray-500 text-sm"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="flex w-full justify-center rounded-lg bg-primary p-3 font-medium text-white hover:bg-opacity-90"
+                  className="flex w-full justify-center rounded-lg bg-sky-600 p-3 font-bold text-white hover:bg-sky-500 transition-colors duration-200 shadow-lg shadow-sky-600/30"
                   disabled={loading}
                 >
-                  {loading ? "Generating..." : "Generate Molecules"}
+                  {loading ? (
+                     <span className="flex items-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Generating...
+                    </span>
+                  ) : ("Generate Molecules")}
                 </button>
               </div>
             </form>
@@ -205,27 +215,30 @@ const ModalLayout = () => {
 
         {/* History Section */}
         <div className="flex flex-col gap-9">
-          <div className="rounded-lg border border-stroke bg-white p-3 shadow-default dark:border-[#121212] dark:bg-[#181818]">
-            <h3 className="font-medium text-black dark:text-white">
-              Molecule Generation History
-            </h3>
-            <div className="mt-4 max-h-96 overflow-y-auto">
+          <div className={cardClasses + " h-full"}>
+            <div className="border-b border-gray-300 dark:border-gray-800 px-6.5 py-4">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+                <History className="h-5 w-5 text-gray-500 mr-2"/>
+                Molecule Generation History
+              </h3>
+            </div>
+            <div className="p-3 max-h-[80vh] overflow-y-auto">
               {history.map((entry) => (
-                <div key={entry.id} className="border-b border-stroke py-3">
-                  <p className="text-sm text-black dark:text-white">
-                    <span className="font-bold">SMILES:</span> {entry.smiles}
+                <div key={entry.id} className="border-b border-gray-300 dark:border-gray-800 py-3 cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-900 transition-colors duration-150 rounded-md px-2">
+                  <p className="text-sm text-gray-900 dark:text-white flex justify-between">
+                    <span className="font-bold text-sky-400">SMILES:</span> <span className="text-gray-500 dark:text-gray-400 truncate ml-2"> {entry.smiles} </span>
                   </p>
-                  <p className="text-sm text-black dark:text-white">
-                    <span className="font-bold">Molecules:</span>{" "}
-                    {entry.numMolecules}
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="font-bold text-sky-400">Molecules:</span>{" "}
+                    {entry.numMolecules} | <span className="font-bold text-sky-400">Sim:</span> {entry.minSimilarity}
                   </p>
-                  <p className="text-sm text-black dark:text-white">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                     <span className="font-bold">Date:</span>{" "}
                     {new Date(entry.createdAt).toLocaleDateString()}
                   </p>
                   <div className="mt-3">
                     <button
-                      className="text-primary hover:underline"
+                      className="text-sky-400 hover:text-sky-300 hover:underline text-sm font-medium transition-colors"
                       onClick={() => setMolecules(entry.generatedMolecules)}
                     >
                       View Molecules
@@ -240,9 +253,15 @@ const ModalLayout = () => {
 
       {/* Display generated molecules */}
       {molecules.length > 0 && (
-        <div className="mt-8 rounded-lg bg-white p-2">
-          <div className="mt-8 flex flex-col gap-2">
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <div className={cardClasses + " mt-8"}>
+          <div className="border-b border-gray-300 dark:border-gray-800 px-6.5 py-4">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+                <Atom className="h-5 w-5 text-sky-500 mr-2 animate-pulse"/>
+                Generated Molecules ({molecules.length})
+            </h3>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {molecules.map((mol, index) => (
                 <MoleculeStructure
                   key={index}
