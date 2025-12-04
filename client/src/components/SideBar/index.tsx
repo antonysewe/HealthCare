@@ -1,168 +1,213 @@
 'use client'
+
 import React, { useState } from 'react'
 import Image from 'next/image';
-import { ChevronDown, Microscope, ChevronUp, Users, User, Settings, Search, Briefcase, Home, LockIcon, LucideIcon, X, AlertCircle, ShieldAlert, AlertTriangle, AlertOctagon, Layers3, Atom, Network } from 'lucide-react';
+import { motion, AnimatePresence, Variants } from "framer-motion";
+import {
+  ChevronDown, Microscope, ChevronUp, Users, User, Settings,
+  Search, Briefcase, Home, LockIcon, LucideIcon, X, AlertCircle,
+  ShieldAlert, AlertTriangle, AlertOctagon, Layers3, Atom, Network
+} from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/app/redux';
 import Link from 'next/link';
 import { setIsSidebarCollapsed } from '@/state';
 import { useGetProjectsQuery } from '@/state/api';
 
-const Sidebar = () => {
-    const[showProjects, setShowProjects] = useState(true);
-    const [showPriority, setShowPriority] = useState(true);
-
-    const {data: projects} = useGetProjectsQuery();
-    const dispatch = useAppDispatch();
-    const isSidebarCollapsed = useAppSelector(
-      (state) => state.global.isSidebarCollapsed
-    );
-
-    const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl
-    transition-all duration-300 h-full z-40 overflow-y-auto bg-white ${isSidebarCollapsed ?"w-0 hidden":"w-64"}`;
-  return (
-    <div className={sidebarClassNames}>
-      <div className='flex h-[100%] w-full flex-col justify-start'>
-        {/* TOP LOGO */}
-        <div className='z-50 flex min-h-[56px] w-64 items-center justify-between bg-white px-6 pt-3 dark:bg-black'>
-            <div className='text-xl font-bold text-gray-800 dark:text-white'>
-                MediPlus
-            </div>
-            {isSidebarCollapsed ? null : (
-              <button className='py-3'onClick={() => {
-                dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
-              }}>
-                <X className='h-6 w-6 text-gray-800 hover:text-gray-500 dark:text-white'/>
-              </button>
-            )}
-        </div>
-        {/* TEAM */}
-        <div className='flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700'>
-            {/*<Image/>*/}
-            <Image
-                src='/logo.png'
-                alt='Team Logo'
-                width={40}
-                height={40}
-                className='rounded-full'
-            />
-            <div>
-                <h3 className='text-md font-bold tracking-wide dark:text-gray-200'>
-                    Antony Team
-                </h3>
-                <div className='mt-1 flex items-start gap-2'>
-                    <LockIcon className='mt-[0.1rem] h-3 w-3 text-gray-500 dark:text-gray-400' />
-                    <p className='text-xs text-gray-500'>Private</p>
-                </div>
-            </div>
-        </div>
-        {/* SIDEBAR LINKS */}
-        <nav className="z-10 w-full">
-          <SidebarLink icon={Home} label="Home" href="/" />
-          <SidebarLink icon={Network} label="Model" href="/model" />
-          <SidebarLink icon={Atom} label="MoleculesBank" href="/moleculesbank" />
-          <SidebarLink icon={Search} label="Research" href="/research" />
-          <SidebarLink icon={Microscope} label="DeepSearch" href="/deepsearch"/>
-          <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
-          <SidebarLink icon={Search} label="Search" href="/search" />
-          <SidebarLink icon={Settings} label="Settings" href="/settings" />
-          <SidebarLink icon={User} label="Users" href="/users" />
-          <SidebarLink icon={Users} label="Teams" href="/teams" />
-        </nav>
-        {/* PROJECTS LINKS */}
-        <button
-          onClick={() => setShowProjects((prev) => !prev)}
-          className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
-        >
-          <span className="">Projects</span>
-          {showProjects ? (
-            <ChevronUp className="h-5 w-5" />
-          ) : (
-            <ChevronDown className="h-5 w-5" />
-          )}
-        </button>
-        {/* PROJECTS LIST */}
-        {showProjects && projects?.map((project) =>(
-          <SidebarLink
-            key={project.id}
-            icon={Briefcase}
-            label={project.name}
-            href={`/projects/${project.id}`}
-          />
-        ))}
-        {/* PRIORITIES LINKS */}
-        <button
-          onClick={() => setShowPriority((prev) => !prev)}
-          className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
-        >
-          <span className="">Priority</span>
-          {showPriority ? (
-            <ChevronUp className="h-5 w-5" />
-          ) : (
-            <ChevronDown className="h-5 w-5" />
-          )}
-        </button>
-         {showPriority && (
-          <>
-            <SidebarLink
-              icon={AlertCircle}
-              label="Urgent"
-              href="/priority/urgent"
-            />
-            <SidebarLink
-              icon={ShieldAlert}
-              label="High"
-              href="/priority/high"
-            />
-            <SidebarLink
-              icon={AlertTriangle}
-              label="Medium"
-              href="/priority/medium"
-            />
-            <SidebarLink icon={AlertOctagon} label="Low" href="/priority/low" />
-            <SidebarLink
-              icon={Layers3}
-              label="Backlog"
-              href="/priority/backlog"
-            />
-          </>
-        )}
-      </div>
-    </div>
-  )
+/* Variants */
+const itemVariants: Variants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 120 } },
 };
 
+const accordionVariants: Variants = {
+  collapsed: { height: 0, opacity: 0, transition: { duration: 0.2 } },
+  expanded: { height: "auto", opacity: 1, transition: { type: "spring", stiffness: 110, damping: 14 } },
+};
+
+/* ------------------ MAIN SIDEBAR ------------------ */
+const Sidebar = () => {
+  const [showProjects, setShowProjects] = useState(true);
+  const [showPriority, setShowPriority] = useState(true);
+
+  const { data: projects } = useGetProjectsQuery();
+  const dispatch = useAppDispatch();
+  const isSidebarCollapsed = useAppSelector((state) => state.global.isSidebarCollapsed);
+
+  return (
+    <>
+      {/* Mobile Backdrop */}
+      <AnimatePresence>
+        {!isSidebarCollapsed && (
+          <motion.div
+            className="fixed inset-0 bg-black/30 z-30 lg:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => dispatch(setIsSidebarCollapsed(true))}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      <motion.div
+        className="fixed flex flex-col h-screen w-64 justify-start shadow-xl z-40 
+          backdrop-blur-xl bg-white/30 dark:bg-gray-900/30 border-r border-gray-200 dark:border-gray-700"
+        initial={{ x: -260 }}
+        animate={{ x: isSidebarCollapsed ? -260 : 0 }}
+        transition={{ type: "spring", stiffness: 90, damping: 20 }}
+      >
+        {/* Top Logo/Header */}
+        <motion.div variants={itemVariants}>
+          <div className="z-50 flex min-h-[56px] w-64 items-center justify-between 
+            px-6 pt-3 border-b border-gray-200 dark:border-gray-800">
+            <div className='text-xl font-bold text-gray-800 dark:text-white'>MediPlus</div>
+            <button className='py-3' onClick={() => dispatch(setIsSidebarCollapsed(true))}>
+              <X className='h-6 w-6 text-gray-800 hover:text-gray-500 dark:text-white' />
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Team Info */}
+        <motion.div variants={itemVariants}>
+          <div className='flex-shrink-0 flex w-64 items-center gap-5 border-y-[1.5px] border-gray-200 
+            px-8 py-4 dark:border-gray-700'>
+            <Image src='/logo.png' alt='Team Logo' width={40} height={40} className='rounded-full' />
+            <div>
+              <h3 className='text-md font-bold tracking-wide dark:text-gray-200'>Antony Team</h3>
+              <div className='mt-1 flex items-start gap-2'>
+                <LockIcon className='mt-[0.1rem] h-3 w-3 text-gray-500 dark:text-gray-400' />
+                <p className='text-xs text-gray-500'>Private</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Links */}
+        <div className="flex-1 overflow-y-auto w-full pb-8">
+          <nav className="z-10 w-full">
+            <AnimatedLink icon={Home} label="Home" href="/" />
+            <AnimatedLink icon={Network} label="Model" href="/model" />
+            <AnimatedLink icon={Atom} label="MoleculesBank" href="/moleculesbank" />
+            <AnimatedLink icon={Search} label="Research" href="/research" />
+            <AnimatedLink icon={Microscope} label="DeepSearch" href="/deepsearch" />
+            <AnimatedLink icon={Briefcase} label="Timeline" href="/timeline" />
+            <AnimatedLink icon={Search} label="Search" href="/search" />
+            <AnimatedLink icon={Settings} label="Settings" href="/settings" />
+            <AnimatedLink icon={User} label="Users" href="/users" />
+            <AnimatedLink icon={Users} label="Teams" href="/teams" />
+          </nav>
+
+          {/* Projects Accordion */}
+          <AccordionButton
+            label="Projects"
+            isOpen={showProjects}
+            toggle={() => setShowProjects(!showProjects)}
+          />
+          <AnimatePresence initial={false}>
+            {showProjects && (
+              <motion.div
+                key="projects"
+                variants={accordionVariants}
+                initial="collapsed"
+                animate="expanded"
+                exit="collapsed"
+                className="overflow-hidden ml-6 mt-2 flex flex-col gap-1"
+              >
+                {projects?.map((project) => (
+                  <AnimatedLink
+                    key={project.id}
+                    icon={Briefcase}
+                    label={project.name}
+                    href={`/projects/${project.id}`}
+                  />
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Priority Accordion */}
+          <AccordionButton
+            label="Priority"
+            isOpen={showPriority}
+            toggle={() => setShowPriority(!showPriority)}
+          />
+          <AnimatePresence initial={false}>
+            {showPriority && (
+              <motion.div
+                key="priority"
+                variants={accordionVariants}
+                initial="collapsed"
+                animate="expanded"
+                exit="collapsed"
+                className="overflow-hidden ml-6 mt-2 flex flex-col gap-1"
+              >
+                <AnimatedLink icon={AlertCircle} label="Urgent" href="/priority/urgent" />
+                <AnimatedLink icon={ShieldAlert} label="High" href="/priority/high" />
+                <AnimatedLink icon={AlertTriangle} label="Medium" href="/priority/medium" />
+                <AnimatedLink icon={AlertOctagon} label="Low" href="/priority/low" />
+                <AnimatedLink icon={Layers3} label="Backlog" href="/priority/backlog" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+    </>
+  )
+}
+
+/* ------------------ Animated Sidebar Link ------------------ */
 interface SidebarLinkProps {
   href: string;
   icon: LucideIcon;
   label: string;
 }
- const SidebarLink = ({
-  href,
-  icon: Icon,
-  label,
- }: SidebarLinkProps) =>{
+const AnimatedLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
   const pathname = usePathname();
-  const isActive = pathname === href || (pathname=== '/' && href === '/dashboard');
-  
-  return(
+  const isActive = pathname === href;
+
+  return (
     <Link href={href} className="w-full">
-      <div
-        className={`relative flex cursor-pointer items-center gap-3 transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 ${
-          isActive ? "bg-gray-100 text-white dark:bg-gray-600" : ""
-        } justify-start px-8 py-3`}
+      <motion.div
+        whileHover={{ scale: 1.03 }}
+        transition={{ type: "spring", stiffness: 160, damping: 12 }}
+        className={`relative flex cursor-pointer items-center gap-3 
+          transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 
+          ${isActive ? "bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-white" : ""}
+          px-8 py-3 rounded-md`}
       >
         {isActive && (
-          <div className="absolute left-0 top-0 h-[100%] w-[5px] bg-blue-200" />
+          <motion.div layoutId="active-link" className="absolute left-0 top-0 h-full w-[5px] bg-blue-500 dark:bg-blue-300 rounded-r" />
         )}
-
-        <Icon className="h-6 w-6 text-gray-800 dark:text-gray-100" />
-        <span className={`font-medium text-gray-800 dark:text-gray-100`}>
-          {label}
-        </span>
-      </div>
+        <Icon className="h-10 w-7 dark:text-gray-100" />
+        <span className="font-medium text-gray-800 dark:text-gray-100">{label}</span>
+      </motion.div>
     </Link>
   )
- }
+}
 
-export default Sidebar
+/* ------------------ Accordion Button ------------------ */
+interface AccordionButtonProps {
+  label: string;
+  isOpen: boolean;
+  toggle: () => void;
+}
+const AccordionButton = ({ label, isOpen, toggle }: AccordionButtonProps) => (
+  <motion.button
+    onClick={toggle}
+    className="flex w-full items-center justify-between px-8 py-3 text-gray-500 
+      hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-semibold"
+  >
+    <span>{label}</span>
+    <motion.div
+      animate={{ rotate: isOpen ? 180 : 0 }}
+      transition={{ type: "spring", stiffness: 160, damping: 12 }}
+    >
+      <ChevronDown />
+    </motion.div>
+  </motion.button>
+);
+
+export default Sidebar;
+
