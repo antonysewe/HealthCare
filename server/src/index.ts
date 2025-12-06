@@ -10,9 +10,12 @@ import taskRoutes from "./routes/taskRoutes";
 import searchRoutes from "./routes/searchRoutes";
 import userRoutes from "./routes/userRoutes";
 
-import moleculesBankRoutes from "./routes/moleculesBankRoutes"
-import moleculeRoutes from "./routes/moleculeRoutes"
-import generatedMoleculesRoutes from  "./routes/generatedMoleculesRoutes"
+import moleculesBankRoutes from "./routes/moleculesBankRoutes";
+import moleculeRoutes from "./routes/moleculeRoutes";
+import generatedMoleculesRoutes from  "./routes/generatedMoleculesRoutes";
+
+
+import drugRoutes from "./routes/drugRoutes";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -42,6 +45,9 @@ app.use("/users" , userRoutes);
 app.use("/moleculesbank", moleculesBankRoutes);
 app.use("/molecules", moleculeRoutes);
 app.use("/api/molecules", generatedMoleculesRoutes);
+
+/* SMILES DRUG GENERATION */
+app.use("/api/drugs", drugRoutes)
 
 
 /* SERVER */

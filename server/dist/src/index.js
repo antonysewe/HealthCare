@@ -17,6 +17,7 @@ const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const moleculesBankRoutes_1 = __importDefault(require("./routes/moleculesBankRoutes"));
 const moleculeRoutes_1 = __importDefault(require("./routes/moleculeRoutes"));
 const generatedMoleculesRoutes_1 = __importDefault(require("./routes/generatedMoleculesRoutes"));
+const drugRoutes_1 = __importDefault(require("./routes/drugRoutes"));
 /* CONFIGURATIONS */
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -40,6 +41,8 @@ app.use("/users", userRoutes_1.default);
 app.use("/moleculesbank", moleculesBankRoutes_1.default);
 app.use("/molecules", moleculeRoutes_1.default);
 app.use("/api/molecules", generatedMoleculesRoutes_1.default);
+/* SMILES DRUG GENERATION */
+app.use("/api/drugs", drugRoutes_1.default);
 /* SERVER */
 const port = Number(process.env.PORT) || 3000;
 app.listen(port, "0.0.0.0", () => {
