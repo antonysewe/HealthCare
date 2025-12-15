@@ -6,7 +6,7 @@ import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
   ChevronDown, Microscope, ChevronUp, Users, User, Settings,
   Search, Briefcase, Home, LockIcon, LucideIcon, X, AlertCircle,
-  ShieldAlert, AlertTriangle, AlertOctagon, Layers3, Atom, Network
+  ShieldAlert, AlertTriangle, AlertOctagon, Layers3, Atom, Network, ListChecks
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/app/redux';
@@ -110,8 +110,9 @@ const Sidebar = () => {
         <div className="flex-1 overflow-y-auto w-full pb-8">
           <nav className="w-full">
             <AnimatedLink icon={Home} label="Home" href="/" />
-            <AnimatedLink icon={Network} label="Model" href="/model" />
             <AnimatedLink icon={Atom} label="MoleculesBank" href="/moleculesbank" />
+            <AnimatedLink icon={Network} label="Model" href="/model" />
+            <AnimatedLink icon={ListChecks} label="Properties" href="/properties" />
             <AnimatedLink icon={Search} label="Research" href="/research" />
             <AnimatedLink icon={Microscope} label="DeepSearch" href="/deepsearch" />
             <AnimatedLink icon={Briefcase} label="Timeline" href="/timeline" />

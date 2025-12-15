@@ -122,6 +122,7 @@ model Molecule {
 }
 model MoleculeGenerationHistory {
   id                Int      @id @default(autoincrement())
+  drugName          String?
   smiles            String
   numMolecules      Int
   minSimilarity     Float

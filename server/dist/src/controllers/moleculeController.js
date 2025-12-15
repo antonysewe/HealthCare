@@ -31,11 +31,12 @@ const getMoleculeHistoryByUser = (req, res) => __awaiter(void 0, void 0, void 0,
 exports.getMoleculeHistoryByUser = getMoleculeHistoryByUser;
 // Create a new molecule generation history entry
 const createMoleculeHistory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId, smiles, numMolecules, minSimilarity, particles, iterations, generatedMolecules, } = req.body;
+    const { userId, drugName, smiles, numMolecules, minSimilarity, particles, iterations, generatedMolecules, } = req.body;
     try {
         const newHistory = yield prisma.moleculeGenerationHistory.create({
             data: {
                 userId,
+                drugName,
                 smiles,
                 numMolecules,
                 minSimilarity,

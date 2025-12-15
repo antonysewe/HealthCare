@@ -1,8 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import MoleculeStructure from "../../components/MoleculeStructure/index";
-import { History, Activity, Atom } from 'lucide-react';
+import { History, Activity, Atom } from "lucide-react";
+import DrugSmilesFetcher from "@/components/DrugSmiles/DrugSmilesFetcher";
+
+import { useAppDispatch, useAppSelector } from "@/app/redux";
+import { setSelectedHistoryId } from "@/state/historySlice";
+import {
+  setDrugName,
+  setSmiles,
+  resetFormExceptDrug,
+  setNumMolecules,
+  setMinSimilarity,
+  setParticles,
+  setIterations,
+  setLoading,
+  setGeneratedMolecules,
+  setHistory,
+} from "@/state/moleculeSlice";
 
 interface GeneratedMolecule {
   structure: string;
@@ -11,6 +27,7 @@ interface GeneratedMolecule {
 
 interface HistoryEntry {
   id: number;
+  drugName: string;
   smiles: string;
   numMolecules: number;
   minSimilarity: number;
@@ -21,17 +38,22 @@ interface HistoryEntry {
 }
 
 const ModalLayout = () => {
-  const [smiles, setSmiles] = useState(
-    "CCN(CC)C(=O)[C@@]1(C)Nc2c(ccc3ccccc23)C[C@H]1N(C)C"
+  const dispatch = useAppDispatch();
+  const selectedHistoryId = useAppSelector(
+    (state) => state.history.selectedHistoryId
   );
-  const [numMolecules, setNumMolecules] = useState("10");
-  const [minSimilarity, setMinSimilarity] = useState("0.3");
-  const [particles, setParticles] = useState("30");
-  const [iterations, setIterations] = useState("10");
 
-  const [molecules, setMolecules] = useState<GeneratedMolecule[]>([]);
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [loading, setLoading] = useState(false);
+  const {
+    smiles,
+    drugName,
+    numMolecules,
+    minSimilarity,
+    particles,
+    iterations,
+    loading,
+    generated,
+    history,
+  } = useAppSelector((state) => state.molecule);
 
   const userId = 1; // Example user ID
 
@@ -40,7 +62,7 @@ const ModalLayout = () => {
     try {
       const res = await fetch(`http://localhost:8000/molecules/history/${userId}`);
       const data: HistoryEntry[] = await res.json();
-      setHistory(data);
+      dispatch(setHistory(data));
     } catch (err) {
       console.error("Error fetching history:", err);
     }
@@ -52,7 +74,7 @@ const ModalLayout = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    dispatch(setLoading(true));
 
     const payload = {
       algorithm: "CMA-ES",
@@ -80,7 +102,7 @@ const ModalLayout = () => {
         })
       );
 
-      setMolecules(generatedMolecules);
+      dispatch(setGeneratedMolecules(generatedMolecules));
 
       // Save history
       await fetch("http://localhost:8000/molecules/history", {
@@ -88,6 +110,7 @@ const ModalLayout = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId,
+          drugName,
           smiles,
           numMolecules: parseInt(numMolecules),
           minSimilarity: parseFloat(minSimilarity),
@@ -101,13 +124,13 @@ const ModalLayout = () => {
     } catch (error) {
       console.error("Error generating molecules:", error);
     } finally {
-      setLoading(false);
+      dispatch(setLoading(false));
     }
   };
 
-  // Card container classes for light & dark mode
-  const cardClasses = "rounded-xl border shadow-2xl transition-colors " +
-    "bg-white border-gray-300 dark:bg-gray-950 dark:border-gray-800";
+  const cardClasses =
+    "rounded-xl border shadow-2xl transition-colors bg-white border-gray-300 dark:bg-gray-950 dark:border-gray-800";
+  const cardHeight = "h-[70vh] sm:h-[75vh] md:h-[54vh] overflow-y-auto";
 
   return (
     <>
@@ -117,9 +140,23 @@ const ModalLayout = () => {
           <div className={cardClasses}>
             <div className="border-b border-gray-300 dark:border-gray-800 px-6.5 py-4 flex items-center justify-between">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-                <Activity className="h-5 w-5 text-sky-500 mr-2"/>
+                <Activity className="h-5 w-5 text-sky-500 mr-2" />
                 SMILES to Molecule Generator
               </h3>
+            </div>
+
+            <div className="max-w-md mx-auto mt-10">
+              <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-300">
+                Drug SMILES Finder
+              </h1>
+              <DrugSmilesFetcher
+                onSmilesSelect={(smilesString, name) => {
+                  // Reset all form fields except drugName
+                  dispatch(resetFormExceptDrug());
+                  dispatch(setDrugName(name));
+                  dispatch(setSmiles(smilesString));
+                }}
+              />
             </div>
 
             <form onSubmit={handleSubmit}>
@@ -133,7 +170,7 @@ const ModalLayout = () => {
                     <input
                       type="text"
                       value={smiles}
-                      onChange={(e) => setSmiles(e.target.value)}
+                      onChange={(e) => dispatch(setSmiles(e.target.value))}
                       placeholder="Enter SMILES string"
                       className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-5 py-3 text-gray-900 dark:text-white outline-none transition focus:border-sky-500 active:border-sky-500 placeholder-gray-500 text-sm resize-none"
                     />
@@ -146,7 +183,7 @@ const ModalLayout = () => {
                     <input
                       type="text"
                       value={numMolecules}
-                      onChange={(e) => setNumMolecules(e.target.value)}
+                      onChange={(e) => dispatch(setNumMolecules(e.target.value))}
                       placeholder="Enter number of molecules"
                       className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-5 py-3 text-gray-900 dark:text-white outline-none transition focus:border-sky-500 active:border-sky-500 placeholder-gray-500 text-sm"
                     />
@@ -161,7 +198,7 @@ const ModalLayout = () => {
                   <input
                     type="text"
                     value={minSimilarity}
-                    onChange={(e) => setMinSimilarity(e.target.value)}
+                    onChange={(e) => dispatch(setMinSimilarity(e.target.value))}
                     placeholder="Enter minimum similarity"
                     className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-5 py-3 text-gray-900 dark:text-white outline-none transition focus:border-sky-500 active:border-sky-500 placeholder-gray-500 text-sm"
                   />
@@ -174,7 +211,7 @@ const ModalLayout = () => {
                   <input
                     type="text"
                     value={particles}
-                    onChange={(e) => setParticles(e.target.value)}
+                    onChange={(e) => dispatch(setParticles(e.target.value))}
                     placeholder="Enter number of particles"
                     className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-5 py-3 text-gray-900 dark:text-white outline-none transition focus:border-sky-500 active:border-sky-500 placeholder-gray-500 text-sm"
                   />
@@ -187,7 +224,7 @@ const ModalLayout = () => {
                   <input
                     type="text"
                     value={iterations}
-                    onChange={(e) => setIterations(e.target.value)}
+                    onChange={(e) => dispatch(setIterations(e.target.value))}
                     placeholder="Enter number of iterations"
                     className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-5 py-3 text-gray-900 dark:text-white outline-none transition focus:border-sky-500 active:border-sky-500 placeholder-gray-500 text-sm"
                   />
@@ -195,18 +232,36 @@ const ModalLayout = () => {
 
                 <button
                   type="submit"
-                  className="flex w-full justify-center rounded-lg bg-sky-600 p-3 font-bold text-white hover:bg-sky-500 transition-colors duration-200 shadow-lg shadow-sky-600/30"
+                  className="flex w-full justify-center rounded-lg bg-sky-600 p-3 font-bold text-white hover:bg-sky-500 transition-colors duration-200 shadow-lg shadow-sky-600/30 cursor-pointer"
                   disabled={loading}
                 >
                   {loading ? (
-                     <span className="flex items-center">
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Generating...
+                    <span className="flex items-center">
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Generating...
                     </span>
-                  ) : ("Generate Molecules")}
+                  ) : (
+                    "Generate Molecules"
+                  )}
                 </button>
               </div>
             </form>
@@ -215,35 +270,55 @@ const ModalLayout = () => {
 
         {/* History Section */}
         <div className="flex flex-col gap-9">
-          <div className={cardClasses + " h-full"}>
-            <div className="border-b border-gray-300 dark:border-gray-800 px-6.5 py-4">
+          <div className={`${cardClasses} ${cardHeight}`}>
+            <div className="border-b border-gray-300 dark:border-gray-800 px-6.5 py-4 flex items-center justify-between">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-                <History className="h-5 w-5 text-gray-500 mr-2"/>
+                <History className="h-5 w-5 text-sky-500 mr-2" />
                 Molecule Generation History
               </h3>
             </div>
-            <div className="p-3 max-h-[80vh] overflow-y-auto">
+            <div className="p-6.5 overflow-y-auto">
               {history.map((entry) => (
-                <div key={entry.id} className="border-b border-gray-300 dark:border-gray-800 py-3 cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-900 transition-colors duration-150 rounded-md px-2">
+                <div
+                  key={entry.id}
+                  onClick={() => {
+                    dispatch(setSelectedHistoryId(entry.id));
+                    dispatch(setGeneratedMolecules(entry.generatedMolecules));
+                    dispatch(setSmiles(entry.smiles));
+                    dispatch(setDrugName(entry.drugName));
+                    dispatch(setNumMolecules(entry.numMolecules.toString()));
+                    dispatch(setMinSimilarity(entry.minSimilarity.toString()));
+                    dispatch(setParticles(entry.particles.toString()));
+                    dispatch(setIterations(entry.iterations.toString()));
+                  }}
+                  className={`border-b border-gray-300 dark:border-gray-800 py-3 cursor-pointer
+                    rounded-md px-2 transition-all duration-200
+                    ${selectedHistoryId === entry.id
+                      ? "bg-sky-500/10 dark:bg-sky-400/10 border-sky-500 shadow-md shadow-sky-500/20"
+                      : "hover:bg-gray-100/50 dark:hover:bg-gray-900"
+                    }`}
+                >
                   <p className="text-sm text-gray-900 dark:text-white flex justify-between">
-                    <span className="font-bold text-sky-400">SMILES:</span> <span className="text-gray-500 dark:text-gray-400 truncate ml-2"> {entry.smiles} </span>
+                    <span className="font-bold text-sky-400">Drug:</span>
+                    <span className="text-gray-500 dark:text-gray-400 truncate ml-2">
+                      {entry.drugName || "—"}
+                    </span>
+                  </p>
+                  <p className="text-sm text-gray-900 dark:text-white flex justify-between">
+                    <span className="font-bold text-sky-400">SMILES:</span>
+                    <span className="text-gray-500 dark:text-gray-400 truncate ml-2">
+                      {entry.smiles}
+                    </span>
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     <span className="font-bold text-sky-400">Molecules:</span>{" "}
-                    {entry.numMolecules} | <span className="font-bold text-sky-400">Sim:</span> {entry.minSimilarity}
+                    {entry.numMolecules} | <span className="font-bold text-sky-400">Sim:</span>{" "}
+                    {entry.minSimilarity}
                   </p>
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                     <span className="font-bold">Date:</span>{" "}
                     {new Date(entry.createdAt).toLocaleDateString()}
                   </p>
-                  <div className="mt-3">
-                    <button
-                      className="text-sky-400 hover:text-sky-300 hover:underline text-sm font-medium transition-colors"
-                      onClick={() => setMolecules(entry.generatedMolecules)}
-                    >
-                      View Molecules
-                    </button>
-                  </div>
                 </div>
               ))}
             </div>
@@ -252,17 +327,17 @@ const ModalLayout = () => {
       </div>
 
       {/* Display generated molecules */}
-      {molecules.length > 0 && (
-        <div className={cardClasses + " mt-8"}>
+      {generated.length > 0 && (
+        <div className={`${cardClasses} mt-8`}>
           <div className="border-b border-gray-300 dark:border-gray-800 px-6.5 py-4">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-                <Atom className="h-5 w-5 text-sky-500 mr-2 animate-pulse"/>
-                Generated Molecules ({molecules.length})
+              <Atom className="h-5 w-5 text-sky-500 mr-2 animate-pulse" />
+              Generated Molecules ({generated.length})
             </h3>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {molecules.map((mol, index) => (
+              {generated.map((mol, index) => (
                 <MoleculeStructure
                   key={index}
                   id={`mol-${index + 1}`}

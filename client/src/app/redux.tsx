@@ -23,6 +23,9 @@ import {
 import { PersistGate } from "redux-persist/integration/react";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 
+import historyReducer from "@/state/historySlice";
+import moleculeReducer from "@/state/moleculeSlice";
+
 /* REDUX PERSISTENCE */
 const createNoopStorage = () => {
   return {
@@ -46,10 +49,12 @@ const storage =
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["global"],
+  whitelist: ["global", "history", "molecule"],
 };
 const rootReducer = combineReducers({
   global: globalReducer,
+  history: historyReducer,
+  molecule: moleculeReducer,
   [api.reducerPath]: api.reducer,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -29,6 +29,7 @@ export const createMoleculeHistory = async (
 ): Promise<void> => {
   const {
     userId,
+    drugName,
     smiles,
     numMolecules,
     minSimilarity,
@@ -41,6 +42,7 @@ export const createMoleculeHistory = async (
     const newHistory = await prisma.moleculeGenerationHistory.create({
       data: {
         userId,
+        drugName,
         smiles,
         numMolecules,
         minSimilarity,
