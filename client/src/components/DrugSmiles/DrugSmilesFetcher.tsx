@@ -1,6 +1,9 @@
 "use client";
 import { useState } from "react";
 
+
+const API_BASE: string = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://fallback-api.com';
+
 interface DrugSmilesFetcherProps {
   onSmilesSelect: (smiles: string, drugName: string) => void;
 }
@@ -14,7 +17,7 @@ const DrugSmilesFetcher: React.FC<DrugSmilesFetcherProps> = ({ onSmilesSelect })
     if (!drug) return;
 
     try {
-      const res = await fetch(`http://localhost:8000/api/drugs/smiles?name=${encodeURIComponent(drug)}`);
+      const res = await fetch(`${API_BASE}/api/drugs/smiles?name=${encodeURIComponent(drug)}`);
       const data: { smiles?: string; error?: string } = await res.json();
 
       if (data.smiles) {

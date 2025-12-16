@@ -25,6 +25,8 @@ import {
 import HistorySidebar from "@/components/HistorySidebar";
 import GeneratedVariantsPanel from "@/components/GeneratedVariantsPanel";
 
+const API_BASE: string = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://fallback-api.com';
+
 // --- INTERFACES ---
 interface MoleculeAnalysis {
   activity: number;
@@ -150,7 +152,7 @@ const BioactivityDashboard = () => {
   // --- API / History ---
   const fetchHistory = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/molecules/history/${userId}`);
+      const res = await fetch(`${API_BASE}/molecules/history/${userId}`);
       const data: HistoryEntry[] = await res.json();
       dispatch(setHistory(data));
     } catch (err) {
@@ -201,7 +203,7 @@ const BioactivityDashboard = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8000/api/molecules/generate", {
+      const response = await fetch(`${API_BASE}/api/molecules/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
