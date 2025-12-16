@@ -20,6 +20,18 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
+
+   images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "hc-s3-images.s3.us-east-2.amazonaws.com",
+        port: "",
+        pathname: "/**",
+      }
+    ]
+  }
+
 };
 
 export default nextConfig;

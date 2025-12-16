@@ -95,7 +95,7 @@ const Sidebar = () => {
         <motion.div variants={itemVariants}>
           <div className='flex-shrink-0 flex w-64 items-center gap-5 border-y border-white/20 
             px-8 py-4 dark:border-gray-700/40'>
-            <Image src='/logo.png' alt='Team Logo' width={40} height={40} className='rounded-full' />
+            <Image src='https://hc-s3-images.s3.us-east-2.amazonaws.com/logo.png' alt='Team Logo' width={40} height={40} className='rounded-full' />
             <div>
               <h3 className='text-md font-bold tracking-wide dark:text-gray-200'>Antony Team</h3>
               <div className='mt-1 flex items-start gap-2'>
