@@ -37,6 +37,9 @@ interface HistoryEntry {
   createdAt: string;
 }
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
+
+
 const ModalLayout = () => {
   const dispatch = useAppDispatch();
   const selectedHistoryId = useAppSelector(
@@ -60,7 +63,7 @@ const ModalLayout = () => {
   // Fetch history from server
   const fetchHistory = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/molecules/history/${userId}`);
+      const res = await fetch(`${API_BASE}/molecules/history/${userId}`);
       const data: HistoryEntry[] = await res.json();
       dispatch(setHistory(data));
     } catch (err) {
@@ -88,7 +91,7 @@ const ModalLayout = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8000/api/molecules/generate", {
+      const response = await fetch(`${API_BASE}/api/molecules/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -105,7 +108,7 @@ const ModalLayout = () => {
       dispatch(setGeneratedMolecules(generatedMolecules));
 
       // Save history
-      await fetch("http://localhost:8000/molecules/history", {
+      await fetch(`${API_BASE}/molecules/history`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
